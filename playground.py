@@ -5,13 +5,19 @@ import time
 
 from gui import GUI
 from players import random_player
+from players import HumanPlayer
+from players import AGC_v4
 from utility.common import *
 
 show_gui = True
 # show_gui = False
 
 player1 = random_player.RandomPlayer()
+# player1 = HumanPlayer.HumanPlayer()
+# player1 = AGC_v4.AGCPlayer(1)
 player2 = random_player.RandomPlayer()
+# player2 = HumanPlayer.HumanPlayer()
+# player2 = AGC_v4.AGCPlayer(2)
 
 gui_delay_secs = 0
 games_to_play = 1000
