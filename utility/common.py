@@ -105,10 +105,11 @@ def detect_win(state, player_num):
     # find matches function
     def find_matches():
         nonlocal num_of_matches
+        nonlocal lines_list
         # find matches:
         for s in lines_list:
             num_of_matches += s.count(string_pattern)
-            return num_of_matches
+        return num_of_matches
 
     # get the rows:
     lines_list.extend([''.join(str(n) for n in row) for row in state])
