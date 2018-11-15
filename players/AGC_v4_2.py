@@ -17,9 +17,7 @@ class AGC:
                          activation="relu", kernel_regularizer=l2(1e-4))(network)
         network = Conv2D(filters=128, kernel_size=(5, 5), padding="same", data_format="channels_first",
                          activation="relu", kernel_regularizer=l2(1e-4))(network)
-        network = Conv2D(filters=256, kernel_size=(5, 5), padding="same", data_format="channels_first",
-                         activation="relu", kernel_regularizer=l2(1e-4))(network)
-        network = Conv2D(filters=512, kernel_size=(5, 5), padding="same", data_format="channels_first",
+        network = Conv2D(filters=128, kernel_size=(5, 5), padding="same", data_format="channels_first",
                          activation="relu", kernel_regularizer=l2(1e-4))(network)
         # action policy layers
         policy_net = Conv2D(filters=4, kernel_size=(1, 1), data_format="channels_first", activation="relu",

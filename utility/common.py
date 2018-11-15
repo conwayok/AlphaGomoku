@@ -1,6 +1,7 @@
 import copy
 
 import numpy as np
+import detect_win
 
 BOARD_WIDTH = 15
 WIN_REQUIRE = 5
@@ -73,9 +74,9 @@ def pos_to_index(pos):
 # 1 if win, -1 if lose, else 0
 def get_reward(state, player_num):
     enemy_num = 2 if player_num == 1 else 1
-    if detect_win(state, player_num):
+    if detect_win.detect_win(state, player_num):
         return 1
-    elif detect_win(state, enemy_num):
+    elif detect_win.detect_win(state, enemy_num):
         return -1
     else:
         return 0
@@ -92,55 +93,55 @@ def get_valid_actions_all(state):
     return valid_actions
 
 
-def detect_win(state, player_num):
-    num_of_matches = 0
-
-    string_pattern = '11111' if player_num == 1 else '22222'
-
-    state_np = np.array(state)
-
-    # all the lines in the state (vertical, horizontal, diagonal)
-    lines_list = []
-
-    # find matches function
-    def find_matches():
-        nonlocal num_of_matches
-        nonlocal lines_list
-        # find matches:
-        for s in lines_list:
-            num_of_matches += s.count(string_pattern)
-        return num_of_matches
-
-    # get the rows:
-    lines_list.extend([''.join(str(n) for n in row) for row in state])
-
-    if find_matches() > 0:
-        return True
-
-    lines_list.clear()
-
-    # get the columns:
-    rotated_state_np = np.rot90(state_np)
-    lines_list.extend([''.join(str(n) for n in row) for row in rotated_state_np.tolist()])
-
-    if find_matches() > 0:
-        return True
-
-    lines_list.clear()
-
-    # get the diagonals:
-    lines_list.extend(
-        [''.join(str(n) for n in state_np.diagonal(i).tolist()) for i in range(-BOARD_WIDTH + 1, BOARD_WIDTH)])
-
-    if find_matches() > 0:
-        return True
-
-    lines_list.clear()
-
-    lines_list.extend(
-        [''.join(str(n) for n in rotated_state_np.diagonal(i).tolist()) for i in range(-BOARD_WIDTH + 1, BOARD_WIDTH)])
-
-    if find_matches() > 0:
-        return True
-
-    return False
+# def detect_win(state, player_num):
+#     num_of_matches = 0
+#
+#     string_pattern = '11111' if player_num == 1 else '22222'
+#
+#     state_np = np.array(state)
+#
+#     # all the lines in the state (vertical, horizontal, diagonal)
+#     lines_list = []
+#
+#     # find matches function
+#     def find_matches():
+#         nonlocal num_of_matches
+#         nonlocal lines_list
+#         # find matches:
+#         for s in lines_list:
+#             num_of_matches += s.count(string_pattern)
+#         return num_of_matches
+#
+#     # get the rows:
+#     lines_list.extend([''.join(str(n) for n in row) for row in state])
+#
+#     if find_matches() > 0:
+#         return True
+#
+#     lines_list.clear()
+#
+#     # get the columns:
+#     rotated_state_np = np.rot90(state_np)
+#     lines_list.extend([''.join(str(n) for n in row) for row in rotated_state_np.tolist()])
+#
+#     if find_matches() > 0:
+#         return True
+#
+#     lines_list.clear()
+#
+#     # get the diagonals:
+#     lines_list.extend(
+#         [''.join(str(n) for n in state_np.diagonal(i).tolist()) for i in range(-BOARD_WIDTH + 1, BOARD_WIDTH)])
+#
+#     if find_matches() > 0:
+#         return True
+#
+#     lines_list.clear()
+#
+#     lines_list.extend(
+#         [''.join(str(n) for n in rotated_state_np.diagonal(i).tolist()) for i in range(-BOARD_WIDTH + 1, BOARD_WIDTH)])
+#
+#     if find_matches() > 0:
+#         return True
+#
+#     return False

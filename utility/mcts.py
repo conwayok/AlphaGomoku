@@ -1,8 +1,9 @@
 # implementation of the mcts algorithm, modified from https://github.com/suragnair/alpha-zero-general
-
+import copy
 import math
-
-from utility.common import *
+import numpy as np
+from utility.common import BOARD_SIZE
+import common
 
 EPS = 1e-8
 
@@ -47,10 +48,11 @@ class MCTS:
     # all states entering this function should be player 1's perspective
     def search(self, state_p1_np):
         s_str = np.array_str(state_p1_np)
+        s_list = state_p1_np.tolist()
 
         # check if reward is assigned to this state yet
         if s_str not in self.s_r:
-            self.s_r[s_str] = get_reward(state_p1_np.tolist(), 1)
+            self.s_r[s_str] = common.get_reward(s_list, 1)
 
         # if is terminal state, return
         if self.s_r[s_str] != 0 or np.count_nonzero(state_p1_np) == BOARD_SIZE:
@@ -59,11 +61,11 @@ class MCTS:
         # check if is leaf node
         # if is leaf node, will have no move probabilities yet
         if s_str not in self.s_p:
-            probs, value = self.policy_value_obj.predict(state_p1_np)
-            valid_actions = get_valid_actions_1d(state_p1_np.tolist(), self.valid_actions_distance)
-            self.s_valid_moves[s_str] = valid_actions
+            probs, value = self.policy_value_obj.predict(s_list)
+            valid_actions_1d = common.get_valid_actions_1d(s_list, self.valid_actions_distance)
+            self.s_valid_moves[s_str] = valid_actions_1d
 
-            mask = [1 if a in valid_actions else 0 for a in range(BOARD_SIZE)]
+            mask = [1 if a in valid_actions_1d else 0 for a in range(BOARD_SIZE)]
             probs = np.array([probs[i] * mask[i] for i in range(BOARD_SIZE)])
             probs_sum = np.sum(probs)
 
@@ -100,7 +102,7 @@ class MCTS:
                 best_action = a
 
         next_s = self.convert_perspective(state_p1_np)
-        best_action_2d = index_to_pos(best_action)
+        best_action_2d = common.index_to_pos(best_action)
         next_s[best_action_2d[0]][best_action_2d[1]] = 2
 
         value = self.search(next_s)
@@ -146,7 +148,7 @@ class MCTSPlayer:
             best_action = (7, 7)
         else:
             probs = self.player.get_probs(state_np)
-            best_action = index_to_pos(probs.index(max(probs)))
+            best_action = common.index_to_pos(probs.index(max(probs)))
 
         return best_action
 
@@ -163,5 +165,5 @@ class MCTSPlayer:
             return best_action, np.array(probs)
 
         probs = self.player.get_probs(state_p1_np)
-        best_action = index_to_pos(probs.index(max(probs)))
+        best_action = common.index_to_pos(probs.index(max(probs)))
         return best_action, probs

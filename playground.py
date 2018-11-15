@@ -5,9 +5,8 @@ import time
 
 from gui import GUI
 from players import random_player
-from players import HumanPlayer
-from players import AGC_v4
 from utility.common import *
+import detect_win
 
 show_gui = True
 # show_gui = False
@@ -63,7 +62,7 @@ for games_played in range(games_to_play):
             GUI.display(state)
             time.sleep(gui_delay_secs)
 
-        if detect_win(state, current_player) > 0:
+        if detect_win.detect_win(state, current_player):
             print('last action:', action)
             if current_player == 1:
                 player_1_wins += 1

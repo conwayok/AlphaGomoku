@@ -4,7 +4,11 @@ import random
 
 from gui import GUI
 from players import AGC_v4
+from players import AGC_v4_2
 from utility.mcts import *
+from utility.common import BOARD_SIZE
+from utility.common import BOARD_WIDTH
+import detect_win
 
 iterations = 1000
 games_per_iteration = 20
@@ -16,7 +20,8 @@ unprepared_training_data = []
 
 
 def start_training():
-    agc = AGC_v4.AGC()
+    agc = AGC_v4.AGC('agc_v4_240games.h5')
+    # agc = AGC_v4_2.AGC()
     for _ in range(1, iterations + 1):
         mcts_player = MCTSPlayer(1, agc)
         mcts_player.player.valid_actions_distance = 2
@@ -27,7 +32,7 @@ def start_training():
         print('Done generating data, training data on nn')
         train_data_on_nn(mcts_player, agc)
         if _ % 1 == 0:
-            agc.save_nn('agc_v4' + str(0 + _ * games_per_iteration) + 'games')
+            agc.save_nn('agc_v4_' + str(240 + _ * games_per_iteration) + 'games')
 
 
 def generate_data(iteration_num, mcts_player):
@@ -80,7 +85,7 @@ def generate_data(iteration_num, mcts_player):
                 GUI.display(state)
 
             # detect win/lose
-            if detect_win(state, current_player):
+            if detect_win.detect_win(state, current_player):
                 game_over = True
                 if current_player == 1:
                     endgame_reward = 1

@@ -61,3 +61,6 @@ test.py
 *.h5
 
 .idea
+*.c
+*.cpp
+*.html
