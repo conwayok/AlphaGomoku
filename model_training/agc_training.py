@@ -3,7 +3,7 @@
 import random
 
 from gui import GUI
-from players import AGC_v4
+# from players import AGC_v4
 from players import AGC_v4_2
 from utility.mcts import *
 from utility.common import BOARD_SIZE
@@ -20,8 +20,7 @@ unprepared_training_data = []
 
 
 def start_training():
-    agc = AGC_v4.AGC('agc_v4_240games.h5')
-    # agc = AGC_v4_2.AGC()
+    agc = AGC_v4_2.AGC()
     for _ in range(1, iterations + 1):
         mcts_player = MCTSPlayer(1, agc)
         mcts_player.player.valid_actions_distance = 2
@@ -32,7 +31,7 @@ def start_training():
         print('Done generating data, training data on nn')
         train_data_on_nn(mcts_player, agc)
         if _ % 1 == 0:
-            agc.save_nn('agc_v4_' + str(240 + _ * games_per_iteration) + 'games')
+            agc.save_nn('agc_v4_' + str(_ * games_per_iteration) + 'games')
 
 
 def generate_data(iteration_num, mcts_player):
