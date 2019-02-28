@@ -1,3 +1,4 @@
+# cython: language_level=3
 def detect_win(list state, int player_num):
     cdef int state_c[15][15]
     cdef int len_pattern = 5
