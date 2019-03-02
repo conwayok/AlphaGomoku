@@ -1,9 +1,10 @@
 # implementation of the mcts algorithm, modified from https://github.com/suragnair/alpha-zero-general
-import copy
-import math
-import numpy as np
-from utility.common import BOARD_SIZE
 import common
+import math
+
+import numpy as np
+
+from utility.common import BOARD_SIZE
 
 EPS = 1e-8
 
@@ -129,8 +130,14 @@ class MCTS:
         counts = [self.sa_n[(state_str, i)] if (state_str, i) in self.sa_n else 0 for i in range(BOARD_SIZE)]
 
         counts_sum = sum(counts)
-        probs = [i / counts_sum for i in counts]
 
+        if counts_sum == 0:
+            valid_actions_1d = common.get_valid_actions_1d(state_p1_np.tolist(), self.valid_actions_distance)
+            prob = 1 / len(valid_actions_1d)
+            probs = [prob if i in valid_actions_1d else 0 for i in range(BOARD_SIZE)]
+            print('counts_sum is 0!')
+        else:
+            probs = [i / counts_sum for i in counts]
         return probs
 
 

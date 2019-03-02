@@ -56,7 +56,7 @@ class AGC:
         # nn_input: 4*15*15, numpy array
         nn_input = self.convert_to_nn_readable(board)
         p, v = self.model.predict(nn_input)
-        return p[0], v[0]
+        return p[0], v[0][0]
 
     @staticmethod
     def convert_to_nn_readable(state):

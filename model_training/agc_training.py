@@ -1,6 +1,7 @@
 # training routine for AGC
 
 import random
+import time
 
 from gui import GUI
 # from players import AGC_v4
@@ -10,10 +11,13 @@ from utility.common import BOARD_SIZE
 from utility.common import BOARD_WIDTH
 import detect_win
 
+# from mcts_cython import *
+
 iterations = 1000
-games_per_iteration = 20
+games_per_iteration = 5
 
 show_gui = True
+show_move_times = True
 
 training_data = []  # [(state, target p, target v), (...), ......]
 unprepared_training_data = []
@@ -24,7 +28,7 @@ def start_training():
     for _ in range(1, iterations + 1):
         mcts_player = MCTSPlayer(1, agc)
         mcts_player.player.valid_actions_distance = 2
-        mcts_player.player.playout_count = 400
+        mcts_player.player.playout_count = 4
         print('ITERATION', _)
         print('Generating data...')
         generate_data(_, mcts_player)
@@ -51,8 +55,16 @@ def generate_data(iteration_num, mcts_player):
         if show_gui:
             GUI.display(state)
 
+        if show_move_times:
+            moves = 0
+
         # play the game
         while not game_over:
+
+            if show_move_times:
+                move_start_time = time.time() * 1000
+                moves += 1
+
             if current_player == 1:
                 mcts_player.player_num = 1
 
@@ -95,6 +107,12 @@ def generate_data(iteration_num, mcts_player):
 
             # swap players
             current_player = 2 if current_player == 1 else 1
+
+            if show_move_times:
+                print('move', moves, 'time', str(time.time() * 1000 - move_start_time), 'ms')
+
+        if show_move_times:
+            moves = 0
 
         unprepared_training_data += [
             [state_data[0], None, endgame_reward] if state_data[1] == 1 else [state_data[0], None, -endgame_reward] for
