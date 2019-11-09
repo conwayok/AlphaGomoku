@@ -7,14 +7,11 @@ from gui import GUI
 # from players import AGC_v4
 from players import AGC_v4_2
 from utility.mcts import *
-from utility.common import BOARD_SIZE
-from utility.common import BOARD_WIDTH
-import detect_win
+from utility.defines import BOARD_SIZE
+from utility.defines import BOARD_WIDTH
 
-# from mcts_cython import *
-
-iterations = 1000
-games_per_iteration = 5
+iterations = 100
+games_per_iteration = 20
 
 show_gui = True
 show_move_times = True
@@ -24,18 +21,18 @@ unprepared_training_data = []
 
 
 def start_training():
-    agc = AGC_v4_2.AGC()
+    agc = AGC_v4_2.AGC('agc_v4_2_2020_games.h5')
     for _ in range(1, iterations + 1):
         mcts_player = MCTSPlayer(1, agc)
         mcts_player.player.valid_actions_distance = 2
-        mcts_player.player.playout_count = 4
+        mcts_player.player.playout_count = 400
         print('ITERATION', _)
         print('Generating data...')
         generate_data(_, mcts_player)
         print('Done generating data, training data on nn')
         train_data_on_nn(mcts_player, agc)
         if _ % 1 == 0:
-            agc.save_nn('agc_v4_' + str(_ * games_per_iteration) + 'games')
+            agc.save_nn('agc_v4_2_' + str(2020 + _ * games_per_iteration) + '_games')
 
 
 def generate_data(iteration_num, mcts_player):
@@ -96,7 +93,7 @@ def generate_data(iteration_num, mcts_player):
                 GUI.display(state)
 
             # detect win/lose
-            if detect_win.detect_win(state, current_player):
+            if common.detect_win(state, current_player):
                 game_over = True
                 if current_player == 1:
                     endgame_reward = 1
@@ -130,8 +127,8 @@ def create_training_example(unprepared_data, mcts):
         if np.count_nonzero(unprepared_data[index][0]) == 0:
             unprepared_data[index][1] = [1 if i == 112 else 0 for i in range(BOARD_SIZE)]
         else:
-            state_str = np.array_str(unprepared_data[index][0])
-            counts = [mcts.sa_n[(state_str, i)] if (state_str, i) in mcts.sa_n else 0 for i in range(BOARD_SIZE)]
+            state_bytes = np.array(unprepared_data[index][0]).tobytes()
+            counts = [mcts.sa_n[(state_bytes, i)] if (state_bytes, i) in mcts.sa_n else 0 for i in range(BOARD_SIZE)]
             counts_sum = sum(counts)
             real_probs = [c / counts_sum for c in counts]
             unprepared_data[index][1] = real_probs

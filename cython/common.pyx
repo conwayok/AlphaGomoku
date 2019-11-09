@@ -58,8 +58,8 @@ cpdef list get_valid_actions(list state, int distance=1):
             for _ in range(distance):
                 check_pos = (check_pos[0] + direction[0], check_pos[1] + direction[1])
                 # if out of bounds
-                if (check_pos[0] < 0 or check_pos[0] >= BOARD_WIDTH) or (
-                        check_pos[1] < 0 or check_pos[1] >= BOARD_WIDTH):
+                if (check_pos[0] < 0 or check_pos[0] >= BOARD_WIDTH) or \
+                        (check_pos[1] < 0 or check_pos[1] >= BOARD_WIDTH):
                     break
                 if state_c[check_pos[0]][check_pos[1]] == 0 and (check_pos[0], check_pos[1]) not in valid_actions:
                     valid_actions.append((check_pos[0], check_pos[1]))
@@ -123,10 +123,10 @@ cpdef bool detect_win(list state, int player_num):
         for j in range(15):
             state_c[i][j] = state[i][j]
 
-    if checkVertical(state_c, BOARD_WIDTH, WIN_REQUIRE, player_num) + \
-            checkHorizontal(state_c, BOARD_WIDTH, WIN_REQUIRE, player_num) + \
-            checkUpLeftToDownRight(state_c, BOARD_WIDTH, WIN_REQUIRE, player_num) + \
-            check_up_right_to_down_left(state_c, BOARD_WIDTH, WIN_REQUIRE, player_num) > 0:
+    if checkVertical(state_c, BOARD_WIDTH, WIN_REQUIRE, player_num) > 0 or \
+            checkHorizontal(state_c, BOARD_WIDTH, WIN_REQUIRE, player_num) > 0 or \
+            checkUpLeftToDownRight(state_c, BOARD_WIDTH, WIN_REQUIRE, player_num) > 0 or \
+            checkUpRightToDownLeft(state_c, BOARD_WIDTH, WIN_REQUIRE, player_num) > 0:
         return True
     else:
         return False
@@ -202,7 +202,7 @@ cdef int checkUpLeftToDownRight(int state2D[15][15], int gameBoardWidth, int win
 
     return 0
 
-cdef int check_up_right_to_down_left(int state2D[15][15], int gameBoardWidth, int winRequire, int player):
+cdef int checkUpRightToDownLeft(int state2D[15][15], int gameBoardWidth, int winRequire, int player):
     cdef int inARow = 0
     cdef int rowIndex
     cdef int colIndex

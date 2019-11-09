@@ -4,22 +4,26 @@ import random
 import time
 
 from gui import GUI
-from players import random_player
-from utility.common import *
-import detect_win
+from players import random_player, AGC_v4_2, Pirate_D, forced_actions_v2
+from players import HumanPlayer
+from utility.defines import *
+import common
 
 show_gui = True
 # show_gui = False
 
-player1 = random_player.RandomPlayer()
+# player1 = random_player.RandomPlayer()
 # player1 = HumanPlayer.HumanPlayer()
-# player1 = AGC_v4.AGCPlayer(1)
-player2 = random_player.RandomPlayer()
+player1 = AGC_v4_2.AGCPlayer(1, 'agc_v4_2_2020_games.h5')
+# player1 = forced_actions_v2.ForcedActionsV2(1)
+# player2 = random_player.RandomPlayer()
 # player2 = HumanPlayer.HumanPlayer()
-# player2 = AGC_v4.AGCPlayer(2)
+# player2 = AGC_v4_2.AGCPlayer(2, 'agc_v4_2_2020_games.h5')
+# player2 = Pirate_D.Player(2)
+player2 = forced_actions_v2.ForcedActionsV2(2)
 
 gui_delay_secs = 0
-games_to_play = 1000
+games_to_play = 100
 print_results_interval = 1
 
 player_1_wins = 0
@@ -62,7 +66,7 @@ for games_played in range(games_to_play):
             GUI.display(state)
             time.sleep(gui_delay_secs)
 
-        if detect_win.detect_win(state, current_player):
+        if common.detect_win(state, current_player):
             print('last action:', action)
             if current_player == 1:
                 player_1_wins += 1
