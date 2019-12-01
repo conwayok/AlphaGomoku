@@ -3,7 +3,7 @@
 import random
 import time
 
-import common
+import alpha_gomoku_common
 from gui import GUI
 from players import AGC_v4_2, forced_actions_v2
 from utility.defines import *
@@ -68,7 +68,7 @@ for games_played in range(games_to_play):
             GUI.display(state)
             time.sleep(gui_delay_secs)
 
-        if common.detect_win(state, current_player):
+        if alpha_gomoku_common.detect_win(state, current_player):
             print('last action:', action)
             if current_player == 1:
                 player_1_wins += 1

@@ -1,5 +1,5 @@
 # implementation of the mcts algorithm, modified from https://github.com/suragnair/alpha-zero-general
-import common
+import alpha_gomoku_common
 import math
 
 import numpy as np
@@ -54,7 +54,7 @@ class MCTS:
 
         # check if reward is assigned to this state yet
         if s_bytes not in self.s_r:
-            self.s_r[s_bytes] = common.get_reward(s_list, 1)
+            self.s_r[s_bytes] = alpha_gomoku_common.get_reward(s_list, 1)
 
         # if is terminal state, return
         if self.s_r[s_bytes] != 0 or np.count_nonzero(state_p1_np) == BOARD_SIZE:
@@ -64,7 +64,7 @@ class MCTS:
         # if is leaf node, will have no move probabilities yet
         if s_bytes not in self.s_p:
             probs, value = self.policy_value_obj.predict(s_list)
-            valid_actions_1d = common.get_valid_actions_1d(s_list, self.valid_actions_distance)
+            valid_actions_1d = alpha_gomoku_common.get_valid_actions_1d(s_list, self.valid_actions_distance)
             self.s_valid_moves[s_bytes] = valid_actions_1d
 
             # mask = [1 if a in valid_actions_1d else 0 for a in range(BOARD_SIZE)]
@@ -105,7 +105,7 @@ class MCTS:
                 best_action = a
 
         next_s = self.convert_perspective(state_p1_np)
-        best_action_2d = common.index_to_pos(best_action)
+        best_action_2d = alpha_gomoku_common.index_to_pos(best_action)
         next_s[best_action_2d[0]][best_action_2d[1]] = 2
 
         value = self.search(next_s)
@@ -132,7 +132,8 @@ class MCTS:
         counts_sum = sum(counts)
 
         if counts_sum == 0:
-            valid_actions_1d = common.get_valid_actions_1d(state_p1_np.tolist(), self.valid_actions_distance)
+            valid_actions_1d = alpha_gomoku_common.get_valid_actions_1d(state_p1_np.tolist(),
+                                                                        self.valid_actions_distance)
             prob = 1 / len(valid_actions_1d)
             probs = [prob if i in valid_actions_1d else 0 for i in range(BOARD_SIZE)]
             print('counts_sum is 0!')
@@ -155,7 +156,7 @@ class MCTSPlayer:
             best_action = (7, 7)
         else:
             probs = self.player.get_probs(state_np)
-            best_action = common.index_to_pos(probs.index(max(probs)))
+            best_action = alpha_gomoku_common.index_to_pos(probs.index(max(probs)))
 
         return best_action
 
@@ -174,5 +175,5 @@ class MCTSPlayer:
             return best_action, np.array(probs)
 
         probs = self.player.get_probs(state_p1_np)
-        best_action = common.index_to_pos(probs.index(max(probs)))
+        best_action = alpha_gomoku_common.index_to_pos(probs.index(max(probs)))
         return best_action, probs
