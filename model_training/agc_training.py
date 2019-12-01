@@ -4,9 +4,7 @@ import random
 import time
 
 from gui import GUI
-# from players import AGC_v4
-from players import AGC_v4_2, AGC_v4_3
-from utility.defines import BOARD_SIZE
+from players import AGC_v4_3
 from utility.defines import BOARD_WIDTH
 from utility.mcts import *
 
