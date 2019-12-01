@@ -3,22 +3,24 @@
 import random
 import time
 
-from gui import GUI
-from players import random_player, AGC_v4_2, Pirate_D, forced_actions_v2
-from players import HumanPlayer
-from utility.defines import *
 import common
+from gui import GUI
+from players import AGC_v4_2, forced_actions_v2
+from utility.defines import *
 
 show_gui = True
 # show_gui = False
 
 # player1 = random_player.RandomPlayer()
 # player1 = HumanPlayer.HumanPlayer()
-player1 = AGC_v4_2.AGCPlayer(1, 'agc_v4_2_2020_games.h5')
+player1 = AGC_v4_2.AGCPlayer(1, 'agc_v4_2_7680_games.h5')
+# player1 = AGC_v4_3.AGCPlayer(1, 'agc_v4_3_3720_games.h5')
+# player1 = AGC_v4_2_forced_actions.AGCPlayer(1, 'agc_v4_2_7680_games.h5')
 # player1 = forced_actions_v2.ForcedActionsV2(1)
 # player2 = random_player.RandomPlayer()
 # player2 = HumanPlayer.HumanPlayer()
-# player2 = AGC_v4_2.AGCPlayer(2, 'agc_v4_2_2020_games.h5')
+# player2 = AGC_v4_3.AGCPlayer(2, 'agc_v4_3_3720_games.h5')
+# player2 = AGC_v4_2.AGCPlayer(2, 'agc_v4_2_4420_games.h5')
 # player2 = Pirate_D.Player(2)
 player2 = forced_actions_v2.ForcedActionsV2(2)
 

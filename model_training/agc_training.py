@@ -5,12 +5,12 @@ import time
 
 from gui import GUI
 # from players import AGC_v4
-from players import AGC_v4_2
-from utility.mcts import *
+from players import AGC_v4_2, AGC_v4_3
 from utility.defines import BOARD_SIZE
 from utility.defines import BOARD_WIDTH
+from utility.mcts import *
 
-iterations = 100
+iterations = 1000
 games_per_iteration = 20
 
 show_gui = True
@@ -21,18 +21,19 @@ unprepared_training_data = []
 
 
 def start_training():
-    agc = AGC_v4_2.AGC('agc_v4_2_2020_games.h5')
+    # agc = AGC_v4_2.AGC('agc_v4_2_4420_games.h5')
+    # agc = AGC_v4_3.AGC('agc_v4_3_4120_games.h5')
+    agc = AGC_v4_3.AGC()
     for _ in range(1, iterations + 1):
-        mcts_player = MCTSPlayer(1, agc)
+        mcts_player = MCTSPlayer(1, agc, c_puct=AGC_v4_3.C_CUPT, playout_count=AGC_v4_3.PLAYOUT_COUNT)
         mcts_player.player.valid_actions_distance = 2
-        mcts_player.player.playout_count = 400
         print('ITERATION', _)
         print('Generating data...')
         generate_data(_, mcts_player)
         print('Done generating data, training data on nn')
         train_data_on_nn(mcts_player, agc)
         if _ % 1 == 0:
-            agc.save_nn('agc_v4_2_' + str(2020 + _ * games_per_iteration) + '_games')
+            agc.save_nn('agc_v4_3_' + str(4120 + _ * games_per_iteration) + '_games')
 
 
 def generate_data(iteration_num, mcts_player):
@@ -116,7 +117,7 @@ def generate_data(iteration_num, mcts_player):
             state_data in
             training_data_temp]
 
-        print('ITERATION', iteration_num, 'Games played', games_played, '/', games_per_iteration, 'played')
+        print('ITERATION', iteration_num, 'Games played', games_played, '/', games_per_iteration)
 
 
 def create_training_example(unprepared_data, mcts):

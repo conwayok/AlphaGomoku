@@ -11,7 +11,7 @@ import common
 from utility.defines import BOARD_SIZE
 from utility.defines import BOARD_WIDTH
 
-C_CUPT = 5
+C_CUPT = 8
 PLAYOUT_COUNT = 400
 
 

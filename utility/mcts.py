@@ -12,7 +12,7 @@ EPS = 1e-8
 class MCTS:
     # all inputs to mcts should be converted to player 1's perspective
     # all states entering this class should be numpy arrays
-    def __init__(self, policy_value_obj):
+    def __init__(self, policy_value_obj, c_puct, playout_count):
         if policy_value_obj is None:
             self.policy_value_obj = self.RandomPolicyValueClass()
         else:
@@ -30,8 +30,8 @@ class MCTS:
 
         self.valid_actions_distance = 1
 
-        self.c_puct = 5  # a constant for the PUCT algorithm
-        self.playout_count = 400  # num of playouts before actually doing the action
+        self.c_puct = c_puct  # a constant for the PUCT algorithm
+        self.playout_count = playout_count  # num of playouts before actually doing the action
 
         self.s_r = {}  # {s, reward of state s}
         self.s_valid_moves = {}  # {s, valid moves for state s}
@@ -142,8 +142,8 @@ class MCTS:
 
 
 class MCTSPlayer:
-    def __init__(self, player_num, policy_value_obj=None):
-        self.player = MCTS(policy_value_obj)
+    def __init__(self, player_num, policy_value_obj=None, c_puct=5, playout_count=400):
+        self.player = MCTS(policy_value_obj, c_puct, playout_count)
         self.player_num = player_num
 
     def choose_action(self, state):
@@ -165,6 +165,8 @@ class MCTSPlayer:
 
     # also returns the probs
     def choose_action_training(self, state_p1_np):
+
+        # if board is empty, place piece in middle
         if np.count_nonzero(state_p1_np) == 0:
             best_action = (7, 7)
             probs = np.zeros(225)
