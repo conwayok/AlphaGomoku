@@ -2,7 +2,7 @@
 
 AlphaGomoku is a Gomoku AI based on [Alpha Zero's algorithm](https://deepmind.com/blog/alphago-zero-learning-scratch/).
 
-**Chinese:** AlphaGomoku 是個基於[Alpha Zero 演算法](https://deepmind.com/blog/alphago-zero-learning-scratch/)演算法的五子棋AI。 本專案需要安裝[Keras](https://keras.io/)
+**Chinese:** AlphaGomoku 是個基於[Alpha Zero 演算法](https://deepmind.com/blog/alphago-zero-learning-scratch/)演算法的五子棋AI。
 
 # How to run
 After cloning the project, training can be started by running **model_training/agc_training.py**. 
