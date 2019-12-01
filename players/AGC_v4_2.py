@@ -1,12 +1,18 @@
 #  Alpha-Gomoku-Conway
-from keras.layers import *
-from keras.models import *
-from keras.optimizers import *
-from keras.regularizers import l2
+import math
 
-from utility.common import BOARD_SIZE
-from utility.common import BOARD_WIDTH
+import numpy as np
+from tensorflow.keras.layers import *
+from tensorflow.keras.models import *
+from tensorflow.keras.optimizers import *
+from tensorflow.keras.regularizers import l2
+
 import common
+from utility.defines import BOARD_SIZE
+from utility.defines import BOARD_WIDTH
+
+C_CUPT = 5
+PLAYOUT_COUNT = 400
 
 
 class AGC:
@@ -48,10 +54,15 @@ class AGC:
 
     def predict(self, board):
         for action in common.get_valid_actions(board):
-            state_copy = copy.deepcopy(board)
-            state_copy[action[0]][action[1]] = 1
-            if common.detect_win(state_copy, 1):
+            board[action[0]][action[1]] = 1
+            win = common.detect_win(board, 1)
+            board[action[0]][action[1]] = 0
+            if win:
                 return [0 if common.index_to_pos(i) != action else 1 for i in range(BOARD_SIZE)], 0.99
+            # state_copy = copy.deepcopy(board)
+            # state_copy[action[0]][action[1]] = 1
+            # if common.detect_win(state_copy, 1):
+            #     return [0 if common.index_to_pos(i) != action else 1 for i in range(BOARD_SIZE)], 0.99
 
         # nn_input: 4*15*15, numpy array
         nn_input = self.convert_to_nn_readable(board)
@@ -65,12 +76,17 @@ class AGC:
 
         # if self is first player
         if np.sum(input_layer_1) == np.sum(input_layer_2):
-            input_layer_3 = [[1 for col in range(15)] for row in range(15)]
-            input_layer_4 = [[0 for col in range(15)] for row in range(15)]
+            # input_layer_3 = [[1 for col in range(15)] for row in range(15)]
+            # input_layer_4 = [[0 for col in range(15)] for row in range(15)]
+            input_layer_3 = np.full((BOARD_WIDTH, BOARD_WIDTH), 1)
+            input_layer_4 = np.full((BOARD_WIDTH, BOARD_WIDTH), 0)
+
         # if self is second player
         else:
-            input_layer_3 = [[0 for col in range(15)] for row in range(15)]
-            input_layer_4 = [[1 for col in range(15)] for row in range(15)]
+            # input_layer_3 = [[0 for col in range(15)] for row in range(15)]
+            # input_layer_4 = [[1 for col in range(15)] for row in range(15)]
+            input_layer_3 = np.full((BOARD_WIDTH, BOARD_WIDTH), 0)
+            input_layer_4 = np.full((BOARD_WIDTH, BOARD_WIDTH), 1)
 
         nn_input = np.expand_dims([input_layer_1, input_layer_2, input_layer_3, input_layer_4], 0)
         return nn_input

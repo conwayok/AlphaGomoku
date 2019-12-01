@@ -5,16 +5,13 @@ import time
 
 from gui import GUI
 # from players import AGC_v4
-from players import AGC_v4_2
+from players import AGC_v4_2, AGC_v4_3
+from utility.defines import BOARD_SIZE
+from utility.defines import BOARD_WIDTH
 from utility.mcts import *
-from utility.common import BOARD_SIZE
-from utility.common import BOARD_WIDTH
-import detect_win
-
-# from mcts_cython import *
 
 iterations = 1000
-games_per_iteration = 5
+games_per_iteration = 20
 
 show_gui = True
 show_move_times = True
@@ -24,18 +21,19 @@ unprepared_training_data = []
 
 
 def start_training():
-    agc = AGC_v4_2.AGC()
+    # agc = AGC_v4_2.AGC('agc_v4_2_4420_games.h5')
+    # agc = AGC_v4_3.AGC('agc_v4_3_4120_games.h5')
+    agc = AGC_v4_3.AGC()
     for _ in range(1, iterations + 1):
-        mcts_player = MCTSPlayer(1, agc)
+        mcts_player = MCTSPlayer(1, agc, c_puct=AGC_v4_3.C_CUPT, playout_count=AGC_v4_3.PLAYOUT_COUNT)
         mcts_player.player.valid_actions_distance = 2
-        mcts_player.player.playout_count = 4
         print('ITERATION', _)
         print('Generating data...')
         generate_data(_, mcts_player)
         print('Done generating data, training data on nn')
         train_data_on_nn(mcts_player, agc)
         if _ % 1 == 0:
-            agc.save_nn('agc_v4_' + str(_ * games_per_iteration) + 'games')
+            agc.save_nn('agc_v4_3_' + str(4120 + _ * games_per_iteration) + '_games')
 
 
 def generate_data(iteration_num, mcts_player):
@@ -96,7 +94,7 @@ def generate_data(iteration_num, mcts_player):
                 GUI.display(state)
 
             # detect win/lose
-            if detect_win.detect_win(state, current_player):
+            if common.detect_win(state, current_player):
                 game_over = True
                 if current_player == 1:
                     endgame_reward = 1
@@ -119,7 +117,7 @@ def generate_data(iteration_num, mcts_player):
             state_data in
             training_data_temp]
 
-        print('ITERATION', iteration_num, 'Games played', games_played, '/', games_per_iteration, 'played')
+        print('ITERATION', iteration_num, 'Games played', games_played, '/', games_per_iteration)
 
 
 def create_training_example(unprepared_data, mcts):
@@ -130,8 +128,8 @@ def create_training_example(unprepared_data, mcts):
         if np.count_nonzero(unprepared_data[index][0]) == 0:
             unprepared_data[index][1] = [1 if i == 112 else 0 for i in range(BOARD_SIZE)]
         else:
-            state_str = np.array_str(unprepared_data[index][0])
-            counts = [mcts.sa_n[(state_str, i)] if (state_str, i) in mcts.sa_n else 0 for i in range(BOARD_SIZE)]
+            state_bytes = np.array(unprepared_data[index][0]).tobytes()
+            counts = [mcts.sa_n[(state_bytes, i)] if (state_bytes, i) in mcts.sa_n else 0 for i in range(BOARD_SIZE)]
             counts_sum = sum(counts)
             real_probs = [c / counts_sum for c in counts]
             unprepared_data[index][1] = real_probs
