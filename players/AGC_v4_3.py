@@ -1,4 +1,5 @@
 #  Alpha-Gomoku-Conway
+import copy
 import math
 
 import numpy as np
@@ -8,6 +9,7 @@ from tensorflow.keras.optimizers import *
 from tensorflow.keras.regularizers import l2
 
 import alpha_gomoku_common
+import gomoku_pattern_detection
 from utility.defines import BOARD_SIZE
 from utility.defines import BOARD_WIDTH
 
@@ -53,17 +55,6 @@ class AGC:
         self.model.fit(x=input_boards, y=[target_ps, target_vs], batch_size=64, epochs=16, verbose=True)
 
     def predict(self, board):
-        for action in alpha_gomoku_common.get_valid_actions(board):
-            board[action[0]][action[1]] = 1
-            win = alpha_gomoku_common.detect_win(board, 1)
-            board[action[0]][action[1]] = 0
-            if win:
-                return [0 if alpha_gomoku_common.index_to_pos(i) != action else 1 for i in range(BOARD_SIZE)], 0.99
-            # state_copy = copy.deepcopy(board)
-            # state_copy[action[0]][action[1]] = 1
-            # if common.detect_win(state_copy, 1):
-            #     return [0 if common.index_to_pos(i) != action else 1 for i in range(BOARD_SIZE)], 0.99
-
         # nn_input: 4*15*15, numpy array
         nn_input = self.convert_to_nn_readable(board)
         p, v = self.model.predict(nn_input)
@@ -103,6 +94,7 @@ class AGCPlayer:
         self.player_num = player_num
         self.enemy_num = 2 if self.player_num == 1 else 1
         self.name = 'AGC_v4'
+        self.forced_actions = True
 
     @staticmethod
     def convert_to_p1_perspective(state):
@@ -116,6 +108,83 @@ class AGCPlayer:
 
         probs, _ = self.brain.predict(state_p1)
         valid_actions = alpha_gomoku_common.get_valid_actions(state, distance=2)
-        prob_mask = np.array([1 if alpha_gomoku_common.index_to_pos(i) in valid_actions else 0 for i in range(BOARD_SIZE)])
+        prob_mask = np.array(
+            [1 if alpha_gomoku_common.index_to_pos(i) in valid_actions else 0 for i in range(BOARD_SIZE)])
         probs *= prob_mask
-        return alpha_gomoku_common.index_to_pos(np.argmax(probs))
+
+        nn_action = alpha_gomoku_common.index_to_pos(np.argmax(probs))
+
+        if self.forced_actions:
+            next_state = copy.deepcopy(state_p1)
+            next_state[nn_action[0]][nn_action[1]] = 1
+            next_state_valid_actions = alpha_gomoku_common.get_valid_actions(next_state, distance=1)
+
+            # force win
+            for action in valid_actions:
+                state_p1[action[0]][action[1]] = 1
+                if gomoku_pattern_detection.detect_pattern(state_p1, 'ooooo', 1) >= 1:
+                    state_p1[action[0]][action[1]] = 0
+                    return action
+                state_p1[action[0]][action[1]] = 0
+
+            # force block lose
+            for action in next_state_valid_actions:
+                next_state[action[0]][action[1]] = 2
+                win = alpha_gomoku_common.detect_win(next_state, 2)
+                next_state[action[0]][action[1]] = 0
+                if win:
+                    return action
+
+            # force create -oooo-
+            for action in valid_actions:
+                state_p1[action[0]][action[1]] = 1
+                if gomoku_pattern_detection.detect_pattern(state_p1, '-oooo-', 1) >= 1:
+                    state_p1[action[0]][action[1]] = 0
+                    return action
+                state_p1[action[0]][action[1]] = 0
+
+            # force block -oooo-
+            if gomoku_pattern_detection.detect_pattern(next_state, '-oooo-', 2) >= 1:
+                for action in next_state_valid_actions:
+                    next_state[action[0]][action[1]] = 1
+                    if gomoku_pattern_detection.detect_pattern(next_state, '-oooo-', 2) == 0:
+                        next_state[action[0]][action[1]] = 0
+                        return action
+                    next_state[action[0]][action[1]] = 0
+
+            # force block -ooo--
+            if gomoku_pattern_detection.detect_pattern(next_state, '-ooo--', 2) >= 1:
+                for action in next_state_valid_actions:
+                    next_state[action[0]][action[1]] = 1
+                    if gomoku_pattern_detection.detect_pattern(next_state, '-ooo--', 2) == 0:
+                        next_state[action[0]][action[1]] = 0
+                        return action
+                    next_state[action[0]][action[1]] = 0
+
+            # force block double threats
+            for action in next_state_valid_actions:
+                next_state[action[0]][action[1]] = 2
+                if (gomoku_pattern_detection.detect_pattern(next_state, '-ooo--', 2) -
+                    gomoku_pattern_detection.detect_pattern(next_state, '--ooo--', 2)) + \
+                        (gomoku_pattern_detection.detect_pattern(next_state, 'oooo-', 2) -
+                         gomoku_pattern_detection.detect_pattern(next_state, '-oooo-', 2)) + \
+                        gomoku_pattern_detection.detect_pattern(next_state, 'oo-oo', 2) \
+                        >= 2:
+                    next_state[action[0]][action[1]] = 0
+                    return action
+                next_state[action[0]][action[1]] = 0
+
+            # force create double threats
+            for action in valid_actions:
+                state_p1[action[0]][action[1]] = 1
+                if (gomoku_pattern_detection.detect_pattern(state_p1, '-ooo--', 1) -
+                    gomoku_pattern_detection.detect_pattern(state_p1, '--ooo--', 1)) + \
+                        (gomoku_pattern_detection.detect_pattern(state_p1, 'oooo-', 1) -
+                         gomoku_pattern_detection.detect_pattern(state_p1, '-oooo-', 1)) + \
+                        gomoku_pattern_detection.detect_pattern(state_p1, 'oo-oo', 1) \
+                        >= 2:
+                    state_p1[action[0]][action[1]] = 0
+                    return action
+                state_p1[action[0]][action[1]] = 0
+
+        return nn_action
