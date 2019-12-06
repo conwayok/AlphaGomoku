@@ -128,10 +128,10 @@ class AGCPlayer:
                 state_p1[action[0]][action[1]] = 0
 
             # force block lose
-            for action in next_state_valid_actions:
-                next_state[action[0]][action[1]] = 2
-                win = alpha_gomoku_common.detect_win(next_state, 2)
-                next_state[action[0]][action[1]] = 0
+            for action in valid_actions:
+                state_p1[action[0]][action[1]] = 2
+                win = alpha_gomoku_common.detect_win(state_p1, 2)
+                state_p1[action[0]][action[1]] = 0
                 if win:
                     return action
 

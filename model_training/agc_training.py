@@ -2,6 +2,7 @@
 
 import random
 import time
+import alpha_gomoku_common
 
 from gui import GUI
 from players import AGC_v4_3
@@ -92,7 +93,7 @@ def generate_data(iteration_num, mcts_player):
                 GUI.display(state)
 
             # detect win/lose
-            if common.detect_win(state, current_player):
+            if alpha_gomoku_common.detect_win(state, current_player):
                 game_over = True
                 if current_player == 1:
                     endgame_reward = 1
