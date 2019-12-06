@@ -168,9 +168,7 @@ class AGCPlayer:
                     gomoku_pattern_detection.detect_pattern(next_state, '--ooo--', 2)) + \
                         (gomoku_pattern_detection.detect_pattern(next_state, 'oooo-', 2) -
                          gomoku_pattern_detection.detect_pattern(next_state, '-oooo-', 2)) + \
-                        gomoku_pattern_detection.detect_pattern(next_state, 'oo-oo', 2) + \
-                        gomoku_pattern_detection.detect_pattern(next_state, 'ooo-o', 2) + \
-                        gomoku_pattern_detection.detect_pattern(next_state, 'o-ooo', 2) \
+                        gomoku_pattern_detection.detect_pattern(next_state, 'oo-oo', 2) \
                         >= 2:
                     next_state[action[0]][action[1]] = 0
                     return action
