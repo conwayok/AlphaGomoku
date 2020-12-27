@@ -13,3 +13,6 @@ Please note that the training may take while, because it requires at least a 400
 **Chinese:** 將專案clone下來後，執行**model_training/agc_training.py** 即可開始訓練。若訓練好想要測試結果，可在執player都設定好後，執行**playground.py**。
 
 訓練過程可能會花上較長一段時間，因為AI需訓練大約4000+場後才會逐漸有成果。建議使用GPU來跑訓練。
+
+# Demo Video
+https://drive.google.com/file/d/15E1Rx6rJS6t5jMG6L_YsadBM39MD6T5X/view?usp=sharing
